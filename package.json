@@ -1,0 +1,16 @@
+{
+  "name": "supertictac",
+  "version": "1.0.0",
+  "description": "The most badass minimalist strategy game on the net",
+  "main": "index.js",
+  "scripts": {
+    "start": "index.js"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "ejs": "^1.0.0",
+    "express": "^4.6.1",
+    "socket.io": "^2.2.0"
+  }
+}
