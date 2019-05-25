@@ -60,17 +60,17 @@ function notation(move) {
             }
             else { 
                 console.log("Non-breaking: Erroneous board position thrown in move notation");
-                return [-1,-1,-1];
+                return [0,-1,-1];
             }
         }
         else { 
             console.log("Non-breaking: Erroneous player thrown in move notation");
-            return [-1,-1,-1];
+            return [0,-1,-1];
         }
     }
     else { 
         console.log("Non-breaking: Erroneously short or long argument thrown into move notation"); 
-        return [-1,-1,-1];
+        return [0,-1,-1];
     }
 }
 
@@ -211,7 +211,7 @@ export default class Board {
 
         //check if the opposite player is moving
         //ensure move validated, if not throw breaking error and do nothing
-        if(themove[0] != -1 && themove[1] != -1 && themove[2] != -1){
+        if(themove[0] != 0 && themove[1] != -1 && themove[2] != -1){
 
             //make sure the next player is taking their turn
             if(themove[0] != lastmove[0]){
