@@ -1,2 +1,2 @@
 //make a connection to the game api server
-var socket = io.connect("/");
+var socket = io('/player');
