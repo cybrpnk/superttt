@@ -33,7 +33,7 @@ app.use(csrf());
 // to simplify view files
 // e.g. static/css/whatever.css redirects internally to /public/css/whatever.css
 app.use('/static', express.static('public'))
-
+//app.use('/modules', express.static('modules'))
 
 
 // use res.render to load up an ejs view file
@@ -58,28 +58,44 @@ var server = app.listen(31415, function(){
 
 
 
-//GAME SERVER FRONT-END SERVER LOGIC
+//////////////////////////////////////
+//GAME SERVER FRONT-END SERVER LOGIC//
+//////////////////////////////////////
 //set up websockets
 const io = socket(server);
 
+//all players active and online rn (array of players' socket.ids)
 var players = [];
 
+//all games in existence (array of board objects [games])
+var games = [];
 
-//create gamesocket and call dependancies for game function
-const gamesocket = io.of('/player');
+//import the board class from gameapi.js
+var game = require("./modules/gameapi.js");
 
-gamesocket.use(sharedsession(session, {
-    autoSave:true
-}));
-
-
-gamesocket.on('connection', function(socket){
-    //identify connection, minus the namespace of player
-    var connection = socket.id.slice(8);
-    //push to global array
+io.on('connection', function(socket){
+    //identify connection the connection
+    var connection = socket.id;
+    //push to global players array
     players.push(connection);
 
-
-    socket.emit('hi', 'Hello everyone!');
+    //log the id of the connection
     console.log("new game socket named: " + connection);
+
+    //when recieving a command for a new room
+    socket.on('newroom', function(pawnchoice){
+        //create game board object
+        var myboard = new game.Board(Date.now().toString() + "-" + games.length.toString(), socket.id, undefined);
+        //push it to global games array
+        games.push(board);
+        
+        //debugging:
+        console.log(board);
+        board.makeMove("XE5");
+        console.log(board);
+    });
+
+    socket.on('matchmaking', function(){
+        
+    });
 });

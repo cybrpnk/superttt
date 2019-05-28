@@ -4,12 +4,29 @@
         <title>Super Tic-Tac-Toe - Welcome to the Ultimate Minimalist Strategy Game</title>
         <meta charset="UTF-8"> 
         <script src="/static/scripts/socket.io.js"></script>
+        <link href="https://fonts.googleapis.com/css?family=Lato&display=swap" rel="stylesheet">
+
+
     </head>
     <body>
         <div class="content">
+            <noscript>SUPER TIC-TAC-TOE REQUIRES JAVASCRIPT TO BE ENABLED IN THE BROWSER</noscript>
             <a href="/play" class="bigbutton">
-                <h1>Play Now!</h1>
+                <h1>Create a Room</h1>
+            </a>
+            <a href="/play" class="bigbutton">
+                <h1>Find a Game</h1>
             </a>
         </div>
+
+        <div class="modal pawnselect">
+            <h2>Choose your weapon</h2>
+            <input type="button" class="playerchoice" value="x">
+            <input type="button" class="playerchoice" value="o">
+            
+        </div>
+
+
+        <script src="/static/scripts/gameui.js"></script>
     </body>
 </html>
