@@ -80,12 +80,18 @@ var winning = [ [1,1,1,0,0,0,0,0,0],
 module.exports = {
     //everything that exists in this game, and ever will
     Board: class {
-        constructor(gameid, player1, player2){
+        constructor(gameid, player1, player2, p1pawnchoice){
             //stores session info about the two players, 
             //to be updated when called by function
             this.xplayer, this.oplayer, 
                 this.players = [player1, player2];
             
+            //set xplayer and oplayer values to appropriate index of players array
+            if (p1pawnchoice == 0 || p1pawnchoice == 1){
+                this.xplayer = p1pawnchoice;
+                this.oplayer = Math.abs(p1pawnchoice-1);
+            }
+            else console.log("ERROR: MALFORMED PAWN CHOICE");
 
             //stores gameid for future server-side processin
             this.id = gameid;

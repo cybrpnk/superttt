@@ -1,10 +1,136 @@
-.content {
-    text-align: center;
+.hidden {
+    display: none;
 }
 
-    .bigbutton {
-        background-color: rgb(63, 63, 136);
+
+.modal {
+
+}
+
+.content {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0; left: 0; right: 0; bottom: 0;
+    margin: 0; padding: 0;
+}
+
+    #sidebar {
         display: inline-block;
-        padding: 25px;
-        color: #fff;
+        position: fixed;
+        top: 0;
+        left: 0;
     }
+
+        .bigbutton {
+            background-color: rgb(63, 63, 136);
+            padding: 1em;
+            color: #fff;
+            width: 100%;;
+            cursor: pointer;
+            margin: 1%;
+            border: 0;
+            float: left;
+            font-size: 1.5em;
+            text-align: center;
+        }
+    
+
+    
+    
+    #mainarea {
+        position: fixed;
+        overflow: auto;
+    }
+
+    #gamearea {
+        margin: 0;
+        height: 100%;
+        width: 100%;
+        position: absolute;
+    }
+    /*#gamearea descendants*/    
+        .metagrid {
+            background-color: #cecece;
+            position: relative;
+        }
+
+            .square {
+                display: inline-block;
+                width: 33.333333%;
+                height: 33.333333%;
+                margin: 0;
+                /*background-color: #3333aa;*/
+                position: absolute;
+            }
+
+                .square.top { top: 0; }
+                .square.middle { top: 33.333333%; }
+                .square.bottom { bottom: 0; }
+
+                .square.left { left: 0; }
+                .square.center { left: 33.333333%; }
+                .square.right { right: 0; }
+
+                .square.meta {
+                    box-sizing: content-box;
+                }
+
+                    .square.meta.left, .square.meta.right {
+                        border-left: 2px solid #4444aa;
+                        border-right: 2px solid #4444aa;
+                    }
+                    .square.meta.top, .square.meta.bottom { 
+                        border-top: 2px solid #4444aa;
+                        border-bottom: 2px solid #4444aa;
+                    }
+                
+                .square.micro {
+                    cursor: pointer;
+                }
+                    .square.micro.left { border-right: 2px solid #9696ce; }
+                    .square.micro.right { border-left: 2px solid #9696ce; }
+
+                    .square.micro.top { border-bottom: 2px solid #9696ce; }
+                    .square.micro.bottom { border-top: 2px solid #9696ce; }
+
+
+/*device orientation specific layouts*/
+@media (orientation: landscape) {
+    #sidebar {
+        width: 25%;
+        height: 100%;
+    }
+    #mainarea {
+        top: 0;
+        left: 25%;
+        height: 100%;
+        width: 75%;
+    }
+    .metagrid {
+        height: 85vh;
+        width: 85vh;
+        margin: 5vh auto;
+    }
+}
+@media (orientation: portrait) {
+    #sidebar {
+        height: 20%;
+        width: 100%;
+    }
+    #mainarea {
+        left: 0;
+        bottom: 0;
+        height: 80%;
+        width: 100%;
+    }
+    .metagrid {
+        height: 90vw;
+        width: 90vw;
+        margin: 0;
+    }
+    .bigbutton {
+       width: 48% !important;
+       font-size: 2em !important;
+    }
+}

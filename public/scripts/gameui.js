@@ -2,7 +2,7 @@
 var socket = io();
 
 setTimeout(function(){
-    socket.emit('newroom', { pawnchoice: 0 });
+    socket.emit('newroom', -1);
     console.log("msg sent");
 
 },3000);

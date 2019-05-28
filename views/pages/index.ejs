@@ -1,32 +1,44 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
         <title>Super Tic-Tac-Toe - Welcome to the Ultimate Minimalist Strategy Game</title>
         <meta charset="UTF-8"> 
-        <script src="/static/scripts/socket.io.js"></script>
         <link href="https://fonts.googleapis.com/css?family=Lato&display=swap" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="static/css/index.css">
 
-
+        <script src="/static/scripts/socket.io.js"></script>
     </head>
     <body>
         <div class="content">
             <noscript>SUPER TIC-TAC-TOE REQUIRES JAVASCRIPT TO BE ENABLED IN THE BROWSER</noscript>
-            <a href="/play" class="bigbutton">
-                <h1>Create a Room</h1>
-            </a>
-            <a href="/play" class="bigbutton">
-                <h1>Find a Game</h1>
-            </a>
-        </div>
-
-        <div class="modal pawnselect">
-            <h2>Choose your weapon</h2>
-            <input type="button" class="playerchoice" value="x">
-            <input type="button" class="playerchoice" value="o">
             
+            <div id="sidebar">
+                <div class="gamemodes">
+                    <input type="button" class="bigbutton" id="newroom" value="Create a Room">
+                    <input type="button" class="bigbutton" id="findgame" value="Find a Game">        
+                </div>
+                
+
+                <div class="hidden modal pawnselect">
+                    <div class="container">
+                        <h2>Choose your weapon</h2>
+                        <input type="button" class="playerchoice" value="x">
+                        <input type="button" class="playerchoice" value="o">
+                        <input type="button" class="playerchoice" value="random">
+    
+                        <input type="text" class="linkshare" readonly value="superttt">
+                    </div>
+                </div>
+
+            </div>
+
+            <div id="mainarea">
+                <% include ../partials/gamearea %>
+            </div>
+
         </div>
-
-
-        <script src="/static/scripts/gameui.js"></script>
+        
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="/static/scripts/homepage.js"></script>
     </body>
 </html>

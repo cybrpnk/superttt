@@ -1,4 +1,4 @@
-/////// index.js
+/////// app.js - main node.js server
 // load "express", a node library to pass variables to an HTML page server-side
 // --tagged: model-view-controller (MVC) framework
 // --credit: https://scotch.io/tutorials/use-ejs-to-template-your-node-application
@@ -12,6 +12,8 @@ var cookieParser = require('cookie-parser');
 var session = require('express-session');
 var csrf = require('csurf');
 var sharedsession = require("express-socket.io-session");
+const Random = require("random-js").Random;
+const random = new Random(); // uses the nativeMath engine
 
 // set the view engine to ejs
 app.set('view engine', 'ejs');
@@ -38,16 +40,18 @@ app.use('/static', express.static('public'))
 
 // use res.render to load up an ejs view file
 
+// a request to the bare URL should take you to the home page
 // index (aka "home") page 
 app.get('/', function(req, res) {
     res.render('pages/index');
 });
 
+/*
 // main game page 
 app.get('/play', function(req, res) {
     res.render('pages/play');
 });
-
+*/
 
 //start the server on localhost at the specified port
 //call "  npm start  " in the terminal to begin the server
@@ -84,15 +88,26 @@ io.on('connection', function(socket){
 
     //when recieving a command for a new room
     socket.on('newroom', function(pawnchoice){
-        //create game board object
-        var myboard = new game.Board(Date.now().toString() + "-" + games.length.toString(), socket.id, undefined);
-        //push it to global games array
-        games.push(board);
-        
-        //debugging:
-        console.log(board);
-        board.makeMove("XE5");
-        console.log(board);
+        var p1pawnchoice;
+        console.log(pawnchoice);
+        if (pawnchoice >= -1 && pawnchoice <= 1){
+            if (pawnchoice == -1) p1pawnchoice = random.integer(0,1);
+            else p1pawnchoice = pawnchoice;
+
+            //create game board object
+            var board = new game.Board(Date.now().toString() + "-" + games.length.toString(), socket.id, undefined, p1pawnchoice);
+            //push it to global games array
+            games.push(board);
+            
+            //debugging:
+            console.log(board);
+            board.makeMove("XE5");
+            console.log(board);
+
+        }
+        else {
+            console.log("ERROR: MISTHROWN PAWNCHOICE");
+        }
     });
 
     socket.on('matchmaking', function(){
