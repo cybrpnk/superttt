@@ -2,9 +2,10 @@
   "name": "supertictac",
   "version": "1.0.0",
   "description": "The most badass minimalist strategy game on the net",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
-    "start": "index.js"
+    "start": "node app.js",
+    "test": "nodemon app.js"
   },
   "author": "",
   "license": "MIT",

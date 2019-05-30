@@ -1,124 +1,131 @@
+<!--BIG TO DO-->
+<!--FIX THE F OUTTA THIS-->
+<!--i'm paranoid its not perfect, but I don't want to waste server-side compute-->
+<!--by just generating everything in for loops-->
+<!--I think that's redundant if it's going to be served often-->
+<!--I feel like this first generation code is buggy af, so I'm not even gonna comment it, just poke at it-->
+
 <div id="gamearea">
     <div class="metagrid">
-        <div class="square meta top left">
-            <div class="square micro top left"></div>
-            <div class="square micro top center"></div>
-            <div class="square micro top right"></div>
+        <div class="square meta top left illegal" id="M0">
+            <div class="square micro top left" id="A1"><div></div></div>
+            <div class="square micro top center" id="B1"><div></div></div>
+            <div class="square micro top right" id="C1"><div></div></div>
 
-            <div class="square micro middle left"></div>
-            <div class="square micro middle center"></div>
-            <div class="square micro middle right"></div>
+            <div class="square micro middle left" id="A2"><div></div></div>
+            <div class="square micro middle center" id="B2"><div></div></div>
+            <div class="square micro middle right" id="C2"><div></div></div>
 
-            <div class="square micro bottom left"></div>
-            <div class="square micro bottom center"></div>
-            <div class="square micro bottom right"></div>
+            <div class="square micro bottom left" id="A3"><div></div></div>
+            <div class="square micro bottom center" id="B3"><div></div></div>
+            <div class="square micro bottom right" id="C3"><div></div></div>
         </div>
-        <div class="square meta top center">
-            <div class="square micro top left"></div>
-            <div class="square micro top center"></div>
-            <div class="square micro top right"></div>
+        <div class="square meta top center illegal" id="M1">
+            <div class="square micro top left" id="D1"><div></div></div>
+            <div class="square micro top center" id="E1"><div></div></div>
+            <div class="square micro top right" id="F1"><div></div></div>
 
-            <div class="square micro middle left"></div>
-            <div class="square micro middle center"></div>
-            <div class="square micro middle right"></div>
+            <div class="square micro middle left" id="D2"><div></div></div>
+            <div class="square micro middle center" id="E2"><div></div></div>
+            <div class="square micro middle right" id="F2"><div></div></div>
 
-            <div class="square micro bottom left"></div>
-            <div class="square micro bottom center"></div>
-            <div class="square micro bottom right"></div>
+            <div class="square micro bottom left" id="D3"><div></div></div>
+            <div class="square micro bottom center" id="E3"><div></div></div>
+            <div class="square micro bottom right" id="F3"><div></div></div>
         </div>
-        <div class="square meta top right">
-            <div class="square micro top left"></div>
-            <div class="square micro top center"></div>
-            <div class="square micro top right"></div>
+        <div class="square meta top right illegal" id="M2">
+            <div class="square micro top left" id="G1"><div></div></div>
+            <div class="square micro top center" id="H1"><div></div></div>
+            <div class="square micro top right" id="I1"><div></div></div>
 
-            <div class="square micro middle left"></div>
-            <div class="square micro middle center"></div>
-            <div class="square micro middle right"></div>
+            <div class="square micro middle left" id="G2"><div></div></div>
+            <div class="square micro middle center" id="H2"><div></div></div>
+            <div class="square micro middle right" id="I2"><div></div></div>
 
-            <div class="square micro bottom left"></div>
-            <div class="square micro bottom center"></div>
-            <div class="square micro bottom right"></div>
-        </div>
-
-
-        <div class="square meta middle left">
-            <div class="square micro top left"></div>
-            <div class="square micro top center"></div>
-            <div class="square micro top right"></div>
-
-            <div class="square micro middle left"></div>
-            <div class="square micro middle center"></div>
-            <div class="square micro middle right"></div>
-
-            <div class="square micro bottom left"></div>
-            <div class="square micro bottom center"></div>
-            <div class="square micro bottom right"></div>
-        </div>
-        <div class="square meta middle center">
-            <div class="square micro top left"></div>
-            <div class="square micro top center"></div>
-            <div class="square micro top right"></div>
-
-            <div class="square micro middle left"></div>
-            <div class="square micro middle center"></div>
-            <div class="square micro middle right"></div>
-
-            <div class="square micro bottom left"></div>
-            <div class="square micro bottom center"></div>
-            <div class="square micro bottom right"></div>
-        </div>
-        <div class="square meta middle right">
-            <div class="square micro top left"></div>
-            <div class="square micro top center"></div>
-            <div class="square micro top right"></div>
-
-            <div class="square micro middle left"></div>
-            <div class="square micro middle center"></div>
-            <div class="square micro middle right"></div>
-
-            <div class="square micro bottom left"></div>
-            <div class="square micro bottom center"></div>
-            <div class="square micro bottom right"></div>
+            <div class="square micro bottom left" id="G3"><div></div></div>
+            <div class="square micro bottom center" id="H3"><div></div></div>
+            <div class="square micro bottom right" id="I3"><div></div></div>
         </div>
 
 
-        <div class="square meta bottom left">
-            <div class="square micro top left"></div>
-            <div class="square micro top center"></div>
-            <div class="square micro top right"></div>
+        <div class="square meta middle left illegal" id="M3">
+            <div class="square micro top left" id="A4"><div></div></div>
+            <div class="square micro top center" id="B4"><div></div></div>
+            <div class="square micro top right" id="C4"><div></div></div>
 
-            <div class="square micro middle left"></div>
-            <div class="square micro middle center"></div>
-            <div class="square micro middle right"></div>
+            <div class="square micro middle left" id="A5"><div></div></div>
+            <div class="square micro middle center" id="B5"><div></div></div>
+            <div class="square micro middle right" id="C5"><div></div></div>
 
-            <div class="square micro bottom left"></div>
-            <div class="square micro bottom center"></div>
-            <div class="square micro bottom right"></div>
+            <div class="square micro bottom left" id="A6"><div></div></div>
+            <div class="square micro bottom center" id="B6"><div></div></div>
+            <div class="square micro bottom right" id="C6"><div></div></div>
         </div>
-        <div class="square meta bottom center">
-            <div class="square micro top left"></div>
-            <div class="square micro top center"></div>
-            <div class="square micro top right"></div>
+        <div class="square meta middle center illegal" id="M4">
+            <div class="square micro top left" id="D4"><div></div></div>
+            <div class="square micro top center" id="E4"><div></div></div>
+            <div class="square micro top right" id="F4"><div></div></div>
 
-            <div class="square micro middle left"></div>
-            <div class="square micro middle center"></div>
-            <div class="square micro middle right"></div>
+            <div class="square micro middle left" id="D5"><div></div></div>
+            <div class="square micro middle center" id="E5"><div></div></div>
+            <div class="square micro middle right" id="F5"><div></div></div>
 
-            <div class="square micro bottom left"></div>
-            <div class="square micro bottom center"></div>
-            <div class="square micro bottom right"></div>
+            <div class="square micro bottom left" id="D6"><div></div></div>
+            <div class="square micro bottom center" id="E6"><div></div></div>
+            <div class="square micro bottom right" id="F6"><div></div></div>
         </div>
-        <div class="square meta bottom right">
-            <div class="square micro top left"></div>
-            <div class="square micro top center"></div>
-            <div class="square micro top right"></div>
+        <div class="square meta middle right illegal" id="M5">
+            <div class="square micro top left" id="G4"><div></div></div>
+            <div class="square micro top center" id="H4"><div></div></div>
+            <div class="square micro top right" id="I4"><div></div></div>
 
-            <div class="square micro middle left"></div>
-            <div class="square micro middle center"></div>
-            <div class="square micro middle right"></div>
+            <div class="square micro middle left" id="G5"><div></div></div>
+            <div class="square micro middle center" id="H5"><div></div></div>
+            <div class="square micro middle right" id="I5"><div></div></div>
 
-            <div class="square micro bottom left"></div>
-            <div class="square micro bottom center"></div>
-            <div class="square micro bottom right"></div>
+            <div class="square micro bottom left" id="G6"><div></div></div>
+            <div class="square micro bottom center" id="H6"><div></div></div>
+            <div class="square micro bottom right" id="I6"><div></div></div>
+        </div>
+
+
+        <div class="square meta bottom left illegal" id="M6">
+            <div class="square micro top left" id="A7"><div></div></div>
+            <div class="square micro top center" id="B7"><div></div></div>
+            <div class="square micro top right" id="C7"><div></div></div>
+
+            <div class="square micro middle left" id="A8"><div></div></div>
+            <div class="square micro middle center" id="B8"><div></div></div>
+            <div class="square micro middle right" id="C8"><div></div></div>
+
+            <div class="square micro bottom left" id="A9"><div></div></div>
+            <div class="square micro bottom center" id="B9"><div></div></div>
+            <div class="square micro bottom right" id="C9"><div></div></div>
+        </div>
+        <div class="square meta bottom center illegal" id="M7">
+            <div class="square micro top left" id="D7"><div></div></div>
+            <div class="square micro top center" id="E7"><div></div></div>
+            <div class="square micro top right" id="F7"><div></div></div>
+
+            <div class="square micro middle left" id="D8"><div></div></div>
+            <div class="square micro middle center" id="E8"><div></div></div>
+            <div class="square micro middle right" id="F8"><div></div></div>
+
+            <div class="square micro bottom left" id="D9"><div></div></div>
+            <div class="square micro bottom center" id="E9"><div></div></div>
+            <div class="square micro bottom right" id="F9"><div></div></div>
+        </div>
+        <div class="square meta bottom right illegal" id="M8">
+            <div class="square micro top left" id="G7"><div></div></div>
+            <div class="square micro top center" id="H7"><div></div></div>
+            <div class="square micro top right" id="I7"><div></div></div>
+
+            <div class="square micro middle left" id="G8"><div></div></div>
+            <div class="square micro middle center" id="H8"><div></div></div>
+            <div class="square micro middle right" id="I8"><div></div></div>
+
+            <div class="square micro bottom left" id="G9"><div></div></div>
+            <div class="square micro bottom center" id="H9"><div></div></div>
+            <div class="square micro bottom right" id="I9"><div></div></div>
         </div>
 </div>

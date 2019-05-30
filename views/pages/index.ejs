@@ -2,43 +2,74 @@
 <html lang="en">
     <head>
         <title>Super Tic-Tac-Toe - Welcome to the Ultimate Minimalist Strategy Game</title>
-        <meta charset="UTF-8"> 
+        <meta charset="UTF-8">
+        <!--load font dependencies-->
         <link href="https://fonts.googleapis.com/css?family=Lato&display=swap" rel="stylesheet">
-        <link rel="stylesheet" type="text/css" href="static/css/index.css">
+        <!--load local stylesheet-->
+        <link rel="stylesheet" type="text/css" href="/static/css/index.css">
 
+        <!--preload socket.io client-side library-->
         <script src="/static/scripts/socket.io.js"></script>
     </head>
     <body>
         <div class="content">
             <noscript>SUPER TIC-TAC-TOE REQUIRES JAVASCRIPT TO BE ENABLED IN THE BROWSER</noscript>
             
+            <!--"sidebar" section to hold metadata about game rooms, players online, stats, etc-->
             <div id="sidebar">
+
+                <!--big ole buttons to let people know wtf 2 do-->
                 <div class="gamemodes">
                     <input type="button" class="bigbutton" id="newroom" value="Create a Room">
                     <input type="button" class="bigbutton" id="findgame" value="Find a Game">        
                 </div>
                 
-
+                <!--where did she come from,-->
                 <div class="hidden modal pawnselect">
+                    <!--?og ehs did erehw-->
+                    <!--be aware: MC(on)tainer is the best wrapper-->
                     <div class="container">
-                        <h2>Choose your weapon</h2>
-                        <input type="button" class="playerchoice" value="x">
-                        <input type="button" class="playerchoice" value="o">
-                        <input type="button" class="playerchoice" value="random">
-    
-                        <input type="text" class="linkshare" readonly value="superttt">
+                        <div class="header">Choose your weapon</div>
+                        <div class="smallbuttons">
+                            <!--honestly what's the point of these comments?-->
+                            <!--if you can't read this basic lookin' HTML, what are you even doing-->
+                            <input type="radio" name="playerchoice" value="0" class="hidden" id="xchoice">
+                            <label for="xchoice" class="choosepawn">x</label>
+                            <input type="radio" name="playerchoice" value="1" class="hidden" id="ochoice">
+                            <label for="ochoice" class="choosepawn">o</label>
+                            <input type="radio" name="playerchoice" value="-1" class="hidden" id="randomchoice">
+                            <label for="randomchoice" class="choosepawn">random</label> 
+                        </div>
+                        <!--link sharing area, contains pop-out copy to clipboard button-->
+                        <div class="shareable">
+                            <input type="text" class="linkshare" readonly value="Share this link with your friend!">
+                            <div class="copylink hidden">Copy Link to Clipboard!</div>
+                        </div>
+
                     </div>
                 </div>
 
             </div>
 
+            <!--main area of the webpage (right side/bottom side, depending on device orientation)-->
             <div id="mainarea">
+                <!--for now we will just fill with our game area-->
                 <% include ../partials/gamearea %>
+                <!--#bottomtext?-->
+                <div id="names">
+                    <span id="versus">YOU ARE </span>
+                    <!--dynamically change player name or whatever here-->
+                    <span class="player">who?</span>
+                </div>
             </div>
 
         </div>
-        
+    
+        <!--oh, don't worry  about me ( ͡° ͜ʖ ͡°)-->
+        <input type="text" id="gameid" class="hidden" value="<%= gameid %>" readonly>
+        <!--( ͡°( ͡° ͜ʖ( ͡° ͜ʖ ͡°)ʖ ͡°) ͡°)-->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="/static/scripts/jquery.fittext.js"></script>
         <script src="/static/scripts/homepage.js"></script>
     </body>
 </html>

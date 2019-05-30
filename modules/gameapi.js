@@ -1,6 +1,10 @@
 ////single game instance metaphor
 ////global game API
 
+//TO DO   - checkLocales and isWinning are completely broken
+//        - send help
+
+
 //toolbox
 var isEqual = function (value, other) {
 
@@ -64,6 +68,20 @@ var isEqual = function (value, other) {
 
 };
 
+var address = function(x,y) {
+    var xtrans = false;
+    var ytrans = false;
+    if(x >= 0 && x <= 2) xtrans = 0;
+        else if(x >= 3 && x <= 5) xtrans = 1;
+        else if(x >= 6 && x <= 8) xtrans = 2;
+    
+    if(y >= 0 && y <= 2) ytrans = 0;
+        else if(y >= 3 && y <= 5) ytrans = 3;
+        else if(y >= 6 && y <= 8) ytrans = 6;
+    
+    if(xtrans !== false && ytrans !== false) return xtrans + ytrans;
+}
+
 //what are all the winning positions?
 var winning = [ [1,1,1,0,0,0,0,0,0],
                 [1,0,0,1,0,0,1,0,0],
@@ -80,25 +98,26 @@ var winning = [ [1,1,1,0,0,0,0,0,0],
 module.exports = {
     //everything that exists in this game, and ever will
     Board: class {
-        constructor(gameid, player1, player2, p1pawnchoice){
+        constructor(gameid, playerarray, p1pawnchoice){
             //stores session info about the two players, 
             //to be updated when called by function
-            this.xplayer, this.oplayer, 
-                this.players = [player1, player2];
+            this.players = {};
             
-            //set xplayer and oplayer values to appropriate index of players array
+            //set x and o player key values to appropriately in players object
             if (p1pawnchoice == 0 || p1pawnchoice == 1){
-                this.xplayer = p1pawnchoice;
-                this.oplayer = Math.abs(p1pawnchoice-1);
+                this.players["x"] = playerarray[p1pawnchoice];
+                this.players["o"] = playerarray[Math.abs(p1pawnchoice-1)];
             }
             else console.log("ERROR: MALFORMED PAWN CHOICE");
 
-            //stores gameid for future server-side processin
+            //stores gameid for future server-side processing
             this.id = gameid;
             
             //X = 1, O = -1, Empty = 0
             //address state multidimensional array with
-            //example: this.state[4][4] 
+            //example: this.state[4][4]
+            //state property is a human readable duplicate of the ui board
+            //confusing! rows first, not columns [x][y]
             this.state= [   [0,0,0,0,0,0,0,0,0],
                             [0,0,0,0,0,0,0,0,0],
                             [0,0,0,0,0,0,0,0,0],
@@ -114,11 +133,32 @@ module.exports = {
                         0,0,0,
                         0,0,0];
 
+            //IMPORTANT UPDATE (5/29/19):
+            //METASTATE PROPERTY ADDED
+            //refers to 9 distinct grids within the tic tac toe grid
+            //addressed:
+            //    0 | 1 | 2
+            //    3 | 4 | 5
+            //    6 | 7 | 8
+            //with each first dimension array leading to a board state
+            //that could be matched by the checkLocales() function
+            this.metastate= [   [0,0,0,0,0,0,0,0,0],
+                                [0,0,0,0,0,0,0,0,0],
+                                [0,0,0,0,0,0,0,0,0],
+                                [0,0,0,0,0,0,0,0,0],
+                                [0,0,0,0,0,0,0,0,0],
+                                [0,0,0,0,0,0,0,0,0],
+                                [0,0,0,0,0,0,0,0,0],
+                                [0,0,0,0,0,0,0,0,0],
+                                [0,0,0,0,0,0,0,0,0]];
 
+            //stores next legal meta tile index [0-8] as a property
+            this.nextLegal = -1;
 
-            
+            //store metadata about adressing squares
             this.columns = ["A","B","C","D","E","F","G","H","I"];
-            this.rows = ["1","2","3","4","5","6","7","8","9"];            
+            this.rows = ["1","2","3","4","5","6","7","8","9"];   
+            
             //stores a list of past moves
             this.movelist = [];
             
@@ -149,8 +189,8 @@ module.exports = {
 
                     //second, if valid move positions are found in both domains, move on
                     if(boardX != -1 && boardY != -1){
-                        //third, if boardX, boardY have not been filled in yet, move on
-                        if(this.state[boardX][boardY] == 0){
+                        //third, if boardY, boardX have not been filled in yet, move on
+                        if(this.state[boardY][boardX] == 0){
                             var player = (firstchar == "X")? 1 : -1;
                             return [player,boardX,boardY];
                         }
@@ -190,10 +230,24 @@ module.exports = {
             //evaluate macro board by breaking it up into wins per team arrays
             for(var m=0; m<8; m++){
                 //check in a positive direction (aka X)
-                if(this.meta[m] === 1) pos[m] = 1;
+                if(this.meta[m] === 1){
+                    pos[m] = 1;
+                    neg[m] = 0;
+                }
                 //check in a negative direction (aka O)
-                if(this.meta[m] === -1) neg[m] = 1;
+                if(this.meta[m] === -1){
+                    pos[m] = 0;
+                    neg[m] = 1;
+                }
+                //check for neutrality
+                if(this.meta[m] === 0){
+                    neg[m] = 0;
+                    pos[m] = 0;
+                }
             }
+
+            console.log(pos);
+            console.log(neg);
 
             //loop through win conditions
             for(var c=0; c<8; c++){
@@ -234,11 +288,24 @@ module.exports = {
                     //break into individual squares
                     for(var l=0; l<8; l++){
                         //check in a positive direction (aka X)
-                        if(this.state[m][l] === 1) pos[l] = 1;
-
+                        if(this.metastate[m][l] === 1){
+                            pos[l] = 1;
+                            neg[l] = 0;
+                        }
                         //check in a negative direction (aka O)
-                        if(this.state[m][l] === -1) neg[l] = 1;
+                        if(this.metastate[m][l] === -1){
+                            pos[l] = 0;
+                            neg[l] = 1;
+                        }
+                        //check for neutrality
+                        if(this.metastate[m][l] === 0){
+                            neg[l] = 0;
+                            pos[l] = 0;
+                        }
                     }
+
+                    console.log(pos);
+                    console.log(neg);
                     
                     //loop through win conditions
                     for(var c=0; c<8; c++){
@@ -246,6 +313,10 @@ module.exports = {
                         //update local function variables, to later update global array
                         if(isEqual(pos,winning[c])) xwon = true;
                         if(isEqual(neg,winning[c])) owon = true;
+
+                        //debugging:
+                        if(xwon) console.log("!!!X wins tile: M" + c + "!!!");
+                        if(owon) console.log("O wins tile: M" + c+ "!!!");
                         //if not, all is still false
                     }
 
@@ -269,9 +340,10 @@ module.exports = {
         //what's the (move)?
         makeMove(move){
             //if this is the first move, force X to move
-            if(this.movelist.length == 0) var lastmove = ["O"];
+            if(this.nextLegal == -1) var lastmove = ["O"];
             //if not, log the last move
             else var lastmove = this.notation(this.movelist[this.movelist.length-1]);
+            //estabilsh the move we're trying to make in computer readable notation
             var themove = this.notation(move);
 
             //check if the opposite player is moving
@@ -280,19 +352,42 @@ module.exports = {
 
                 //make sure the next player is taking their turn
                 if(themove[0] != lastmove[0]){
-                    //manipulate the board object's properties to make all the moves
-                    this.state[themove[1]][themove[2]] = themove[0];
-                    this.movelist.push(move);
-                    //check win statuses
-                    this.checkLocales();
-                    this.isWinning();
+                    //make sure players are moving through the board according to the rules
+                    if(this.nextLegal == address(themove[1],themove[2]) || this.nextLegal == -1){
+                        //manipulate the board object's properties to make all the moves
+                        this.state[themove[2]][themove[1]] = themove[0];
+                        this.movelist.push(move);
+                        //you dont need to try to follow my mental math gymnastics here
+                        //pretty much im taking 0-2, 3-5, 6-8 indexes 
+                        //rounded to 0,1,2 and 0,3,6 and adding them respectively
+                        //to get a final index that addresses the metastate
+                        //don't worry about it
+                        var transtometa = (themove[1]%3)+(3*(themove[2]%3));
+                        this.metastate[address(themove[1],themove[2])][transtometa] = themove[0];
+                        //check win statuses
+                        this.checkLocales();
+                        this.isWinning();
+                        this.nextLegal = transtometa;
+
+                        return themove;
+                    }
+                    else {
+                        console.log("Illegal: next turn must occur in determined meta tile");
+                        return false;
+                    } 
                 }
                 //no second turns
-                else console.log("Illegal: Player cannot move twice in a row");
+                else {
+                    console.log("Illegal: Player cannot move twice in a row");
+                    return false;
+                }
 
             }
             //this.notation function could not validate the move
-            else console.log("Invalid: move, ya dunce");
+            else {
+                console.log("Invalid: move, ya dunce");
+                return false;
+            }
 
         }
 

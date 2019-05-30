@@ -1,11 +1,68 @@
+/*////////---/static/css/index.css//////////*/
+/*  A NOTE ABOUT MY CSS FORMATTING
+/*  it is by no means a perfect system
+/*  ideally, i'd love to be using sass or another preprocessor
+/*  but i know we ain't there yet
+/*  THIS CODE is indented and organized in reference to 
+/*  HIERARCHY WITHIN THE DOM (RENDERED HTML PAGE)
+/*  please don't make me hunt you down./////*/
+
+/*/TO DO  - organize?
+            - COME UP WITH FINAL DESIGN
+            - THIS DESIGN IS V ROUGH, JUST TO MOVE FAST
+/*/
+
+/*toolbox classes*/
 .hidden {
-    display: none;
+    /*.hidden class is used very often to take things off the screen briefly*/
+    display: none !important;
+    position: absolute !important;
+    top: -9999px !important;
+    left: -9999px !important;
 }
 
-
+/*.modal class refers to popup window, 
+specifically the one with options to create a new room*/
 .modal {
-
+    background-color: rgba(11,11,11,50);
+    float: left;
 }
+    /*style for link sharing text box*/
+    .modal .container > div, .modal input.linkshare {
+        text-align: center;
+        margin: 0.75em 0 !important;
+        color: #fff;
+    }
+        /*style for "choose your weapon" text*/
+        .modal .header {
+            font: bold 1.5em "Comic Sans", "Comic Sans MS", serif;
+        }
+        /*style for buttons to choose pawn for host of game, and to copy link*/
+        .choosepawn, .modal .copylink {
+            background-color: rgb(142, 142, 170);
+            display: inline-block;
+            padding: 0.25em;
+            border: 1px solid #888;
+            cursor: pointer;
+            -webkit-user-select: none;  /* Chrome all / Safari all */
+            -moz-user-select: none;     /* Firefox all */
+            -ms-user-select: none;      /* IE 10+ */
+            user-select: none;          /* Likely future */
+            width: 20%;
+            min-width: 70px;
+        }
+        .modal input.linkshare {
+            background-color: rgba(209, 209, 221, 0.33);
+            width: 90%;
+            border: 1px solid #aaa;
+            font-size: 0.75em;
+            height: 2em;
+            padding: 0.25em;
+        }
+        .modal .copylink {
+            width: 90% !important;
+        }
+
 
 .content {
     position: fixed;
@@ -13,6 +70,7 @@
     height: 100%;
     top: 0; left: 0; right: 0; bottom: 0;
     margin: 0; padding: 0;
+    font-family: Lato, sans-serif !important;
 }
 
     #sidebar {
@@ -20,13 +78,14 @@
         position: fixed;
         top: 0;
         left: 0;
+        z-index: 100;
     }
 
         .bigbutton {
             background-color: rgb(63, 63, 136);
             padding: 1em;
             color: #fff;
-            width: 100%;;
+            width: 98%;;
             cursor: pointer;
             margin: 1%;
             border: 0;
@@ -42,6 +101,16 @@
         position: fixed;
         overflow: auto;
     }
+        #names {
+            text-align: center;
+            display: block;
+            height: 5vh;
+            width: 100%;
+        }
+            #names .player {
+                font-weight: bold;
+                font-size: 1.5em;
+            }
 
     #gamearea {
         margin: 0;
@@ -51,7 +120,6 @@
     }
     /*#gamearea descendants*/    
         .metagrid {
-            background-color: #cecece;
             position: relative;
         }
 
@@ -60,7 +128,6 @@
                 width: 33.333333%;
                 height: 33.333333%;
                 margin: 0;
-                /*background-color: #3333aa;*/
                 position: absolute;
             }
 
@@ -73,7 +140,8 @@
                 .square.right { right: 0; }
 
                 .square.meta {
-                    box-sizing: content-box;
+                    box-sizing: border-box;
+                    background-color: #cecece;
                 }
 
                     .square.meta.left, .square.meta.right {
@@ -84,15 +152,27 @@
                         border-top: 2px solid #4444aa;
                         border-bottom: 2px solid #4444aa;
                     }
-                
-                .square.micro {
-                    cursor: pointer;
+                    
+                    .square.meta.legal {
+                        background-color: #efefef;
+                    }
+                        .square.meta.legal > .square.micro {
+                            cursor: pointer;
+                        }
+
+                .square.micro  {
+                    cursor: grabbing;
+                    z-index: 101;
                 }
                     .square.micro.left { border-right: 2px solid #9696ce; }
                     .square.micro.right { border-left: 2px solid #9696ce; }
 
                     .square.micro.top { border-bottom: 2px solid #9696ce; }
                     .square.micro.bottom { border-top: 2px solid #9696ce; }
+                        
+                        .square.micro > div {
+                            text-align: center;
+                        }
 
 
 /*device orientation specific layouts*/
@@ -111,6 +191,10 @@
         height: 85vh;
         width: 85vh;
         margin: 5vh auto;
+    }
+    .modal {
+        width: 98%;
+        margin: 1%;
     }
 }
 @media (orientation: portrait) {
@@ -133,4 +217,18 @@
        width: 48% !important;
        font-size: 2em !important;
     }
+    .modal {
+        width: 98%;
+        padding: 1%;
+        position: fixed;
+        height: 98%;
+        z-index: 200;
+    }
+        .modal .container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%,-50%);
+            width: 100%;
+        }
 }
