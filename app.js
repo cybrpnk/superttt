@@ -113,6 +113,11 @@ var game = require("./modules/gameapi.js");
 var xopening = ["M0","M1","M2","M3","M4","M5","M6","M7","M8"];
 
 
+//////TO DO:   ///////////////////////////////
+//////create disconnect and rejoining events//
+
+//////////////////////////////////////////////
+
 //when a user enters the site!
 //note: we still need to make a disconnect event
 io.on('connection', function(socket){
@@ -179,12 +184,13 @@ io.on('connection', function(socket){
             }
             else {
                 //error: game is full
+                socket.emit('redirect', '/');
                 console.log("game is full :(");
             }
         }
         else {
             //error: game does not exist
-            socket.emit('gohome');
+            socket.emit('redirect', '/');
         }
     });
 
@@ -196,34 +202,36 @@ io.on('connection', function(socket){
         //get game object locally
         var findgame = games[gameid];
 
-        //if game id exists in games object, and also if games object isn't empty
-        if(findgame.id !== undefined && Object.keys(games).length > 0){
+        //if game exists in games object
+        //if games object isn't empty
+        if(findgame !== undefined && Object.keys(games).length > 0){
             //insert imaginary validation conditional here
             //if(your move isn't bad){
+            
 
                 //send the makeMove command to the Board API, and save the return as themove
                 var themove = findgame.makeMove(move);
+                console.log("the emperor's new moves too");
                 //return of makeMove function is saved, because makeMove() method
                 //should be in charge of all validation to pushing to the board array
                 //then should return any errors, and fail gracefully
                 //a future implementation of this socket event should have stricter rules based on makeMove()'s return
-
                 //if the move is from x
-                if(themove[0] == 1 ) {
+                if(themove[0] === 1 ) {
                     //update both players local boards, updating new legal moves, and moves to be added to the board
                     io.to(findgame.players.o).emit("updateboard", ["M" + findgame.nextLegal.toString()], move, findgame.movelist.length);
-                    io.to(findgame.players.x).emit("updateboard", [], -1, findgame.movelist.length);
+                    io.to(findgame.players.x).emit("updateboard", [], move, findgame.movelist.length);
                 }
-                //if the move is from x
-                if(themove[0] == -1){
+                //if the move is from o
+                if(themove[0] === -1){
                     //update both players local boards, updating new legal moves, and moves to be added to the board
                     io.to(findgame.players.x).emit("updateboard", ["M" + findgame.nextLegal.toString()], move, findgame.movelist.length);
-                    io.to(findgame.players.o).emit("updateboard", [], -1, findgame.movelist.length);
+                    io.to(findgame.players.o).emit("updateboard", [], move, findgame.movelist.length);
                 }
                 
                 //debugging
-                console.log(findgame.metastate);
-                //console.log(findgame.movelist);
+                //console.log(findgame.metastate);
+                console.log(findgame.movelist);
 
                 //confirm newmove sucessfully passed, and callback
                 callback();

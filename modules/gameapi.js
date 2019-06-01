@@ -173,7 +173,7 @@ module.exports = {
         //outputs: ["X",4,4]
         //outputs: ["O",8,8]
         //remember off by zero, board is a multidimensional array [0-8][0-8]
-        notation(move) {
+        notation(move, valid) {
             if(move.length === 3){
                 //break move argument into pieces
                 var firstchar = move[0];
@@ -190,7 +190,7 @@ module.exports = {
                     //second, if valid move positions are found in both domains, move on
                     if(boardX != -1 && boardY != -1){
                         //third, if boardY, boardX have not been filled in yet, move on
-                        if(this.state[boardY][boardX] == 0){
+                        if(this.state[boardY][boardX] == 0 || !valid){
                             var player = (firstchar == "X")? 1 : -1;
                             return [player,boardX,boardY];
                         }
@@ -250,10 +250,16 @@ module.exports = {
             console.log(neg);
 
             //loop through win conditions
-            for(var c=0; c<8; c++){
+            for(var condition=0; condition<8; condition++){
                 //pattern match to see if either palyer has won the meta
-                if(isEqual(pos,winning[c])) xwon = true;
-                if(isEqual(neg,winning[c])) owon = true;
+                if(isEqual(pos,winning[condition])){ 
+                    xwon = true;
+                    condition = 8;
+                }
+                if(isEqual(neg,winning[condition])){
+                    owon = true;
+                    condition = 8;
+                }
             }
 
             //double check there's no error with our code
@@ -272,7 +278,7 @@ module.exports = {
         //determine the game.
         checkLocales() {
             //determine if a player is winning in a local board
-            for(var m=0; m<8; m++){
+            for(var m=0; m<9; m++){
                 //check if specified meta locale has been won,
                 //dont waste compute if it has
                 if(this.meta[m] === 0){
@@ -286,47 +292,58 @@ module.exports = {
                     var owon = false;
 
                     //break into individual squares
-                    for(var l=0; l<8; l++){
+                    //this loop will create pos[0-8] and neg[0-8]
+                    //per local board
+                    for(var l=0; l<9; l++){
                         //check in a positive direction (aka X)
                         if(this.metastate[m][l] === 1){
                             pos[l] = 1;
                             neg[l] = 0;
                         }
                         //check in a negative direction (aka O)
-                        if(this.metastate[m][l] === -1){
+                        else if(this.metastate[m][l] === -1){
                             pos[l] = 0;
                             neg[l] = 1;
                         }
                         //check for neutrality
-                        if(this.metastate[m][l] === 0){
+                        else {
                             neg[l] = 0;
                             pos[l] = 0;
                         }
                     }
 
-                    console.log(pos);
-                    console.log(neg);
+                    //console.log("board - M" + m + "pos: [" + pos + "]");
+                    //console.log("board - M" + m + "neg: [" + neg + "]");
                     
                     //loop through win conditions
-                    for(var c=0; c<8; c++){
+                    for(var condition=0; condition<8; condition++){
                         //pattern match to see if either palyer has won the meta
                         //update local function variables, to later update global array
-                        if(isEqual(pos,winning[c])) xwon = true;
-                        if(isEqual(neg,winning[c])) owon = true;
-
-                        //debugging:
-                        if(xwon) console.log("!!!X wins tile: M" + c + "!!!");
-                        if(owon) console.log("O wins tile: M" + c+ "!!!");
+                        if(isEqual(pos,winning[condition])){
+                            xwon = true;
+                            condition = 8;
+                        }
+                        if(isEqual(neg,winning[condition])){
+                            owon = true;
+                            condition = 8;
+                        }
                         //if not, all is still false
                     }
+
+                    //debugging:
+                    if(xwon) console.log("!!!X wins tile: M" + m + "!!!");
+                    if(owon) console.log("O wins tile: M" + m + "!!!");
 
                     //double check there's no error with our code
                     if(xwon && owon) console.log("MEGA-ERROR: I THINK BOTH OF YALL WON LOCALE #" + M + "!");
                     else {
                         //update "battle" win history/state board array,
-                        //only if board is won
-                        if(xwon) this.meta[m] = 1;
-                        if(owon) this.meta[m] = -1;
+                        //only if board is won, and has not previously been won
+                        if(xwon && this.meta[m] === 0) this.meta[m] = 1;
+                        if(owon && this.meta[m] === 0) this.meta[m] = -1;
+
+                        //debugging:
+                        //console.log(this.metastate[m]);
                     }
 
                 }
@@ -339,12 +356,15 @@ module.exports = {
         //move must be in three character notation form (string)
         //what's the (move)?
         makeMove(move){
+            console.log("just got makeMove");
             //if this is the first move, force X to move
             if(this.nextLegal == -1) var lastmove = ["O"];
             //if not, log the last move
-            else var lastmove = this.notation(this.movelist[this.movelist.length-1]);
+            else var lastmove = this.notation(this.movelist[this.movelist.length-1], false);
+            console.log("just set lastmove");
             //estabilsh the move we're trying to make in computer readable notation
-            var themove = this.notation(move);
+            var themove = this.notation(move, true);
+            console.log("just set new move");
 
             //check if the opposite player is moving
             //ensure move validated, if not throw breaking error and do nothing

@@ -50,6 +50,9 @@ specifically the one with options to create a new room*/
             user-select: none;          /* Likely future */
             width: 20%;
             min-width: 70px;
+            box-sizing: border-box;
+            font-size: 1em;
+            height: auto;
         }
         .modal input.linkshare {
             background-color: rgba(209, 209, 221, 0.33);
@@ -80,19 +83,23 @@ specifically the one with options to create a new room*/
         left: 0;
         z-index: 100;
     }
-
-        .bigbutton {
-            background-color: rgb(63, 63, 136);
-            padding: 1em;
-            color: #fff;
-            width: 98%;;
-            cursor: pointer;
-            margin: 1%;
-            border: 0;
-            float: left;
-            font-size: 1.5em;
-            text-align: center;
+        .gamemodes {
+            display: inline-block;
+            vertical-align: middle;          /* vertical alignment of the inline element */
+            width: 100%;
         }
+            .bigbutton {
+                background-color: rgb(63, 63, 136);
+                padding: 1em 0;
+                color: #fff;
+                width: 98%;;
+                cursor: pointer;
+                margin: 1%;
+                border: 0;
+                float: left;
+                font-size: 1.5em;
+                text-align: center;
+            }
     
 
     
@@ -183,7 +190,7 @@ specifically the one with options to create a new room*/
     }
     #mainarea {
         top: 0;
-        left: 25%;
+        right: 0;
         height: 100%;
         width: 75%;
     }
@@ -196,12 +203,19 @@ specifically the one with options to create a new room*/
         width: 98%;
         margin: 1%;
     }
+    .modal .close-mobile {
+        display: none;
+    }
 }
 @media (orientation: portrait) {
     #sidebar {
         height: 20%;
         width: 100%;
     }
+        #sidebar:before {      /* create a full-height inline block pseudo-element */
+            content: ' ';
+            display: inline-block;
+        }
     #mainarea {
         left: 0;
         bottom: 0;
@@ -211,18 +225,19 @@ specifically the one with options to create a new room*/
     .metagrid {
         height: 90vw;
         width: 90vw;
-        margin: 0;
+        margin: 5vw auto;
     }
     .bigbutton {
        width: 48% !important;
-       font-size: 2em !important;
     }
     .modal {
         width: 98%;
         padding: 1%;
         position: fixed;
+        top: 0;
         height: 98%;
         z-index: 200;
+        overflow: auto;
     }
         .modal .container {
             position: absolute;
@@ -231,4 +246,36 @@ specifically the one with options to create a new room*/
             transform: translate(-50%,-50%);
             width: 100%;
         }
+            .modal .close-mobile {
+                background-color: #efefef;
+                color:  #1d1d1d !important;
+                border-radius: 50%;
+                padding: 0.25em;
+                font-size: 2em;
+                display: inline-block;
+                height: 1.25em;
+                width: 1.25em;
+                cursor: pointer;
+                position: absolute;
+                top: 0;
+                right: 0;
+                text-align: center;
+                margin: 1em;
+                z-index: 300;
+            }
+                .choosepawn[for=xchoice], .choosepawn[for=ochoice] {
+                    padding: 1.5vw;
+                    width: 44.5vw;
+                    margin: 1.5vw;
+                    height: 44.5vw;
+                }
+                .choosepawn[for=randomchoice] {
+                    padding: 1.5vw;
+                    width: 92vw;
+                    margin: 1.5vw;
+                    height: 22.3vw;
+                }
+                .shareable {
+                    font-size: 3em !important;
+                }
 }

@@ -56,7 +56,8 @@ $(document).ready(function(){
         if(lastmove !== mypawn){
             //send newmove command to server with all the needed arguments from the HTML itself
             socket.emit('newmove', gameid, mypawn + element.attr("id"), function(){
-                element.children("div").html(mypawn);
+                //callback
+                lastmove = mypawn;
             });
         }
     }
@@ -66,13 +67,33 @@ $(document).ready(function(){
 
     //basic resizing rules - all web design should be as responsive as contextually possible
     $(".square.micro > div").fitText(.125);
+    $(".bigbutton").fitText(0.7);
+    //if in portrait mode
+    var prevwidth = 0;
+    function portrait(){
+        if($(window).height() > $(window).width() && Math.abs($(window).width() - prevwidth) > 5){
+            $(".choosepawn[for=xchoice], .choosepawn[for=ochoice]").fitText(0.145);
+            $(".choosepawn[for=randomchoice]").fitText(0.65);
+        }
+        else {
+            $(".choosepawn").css("font-size", '1em');
+            console.log("flippy");
+        }
+        prevwidth = $(window).height();
+    }
+    //call portrait resizer function
+    //once on document ready
+    portrait();
+    //again whenever page scales
+    $(window).resize(portrait);
 
 
     //interactivity modules - watch user interaction on certain specified HTML elements
     //"interavtive" refers to jQuery's $(~element~).on( _event_, _handler_ ) method to
     //handle user interaction with the DOM (rendered HTML)
     //big buttons should do big things
-    $(".bigbutton#newroom").click(function(event){
+    //(also our close buttons should close things)
+    $(".bigbutton#newroom, .pawnselect.modal .close-mobile").click(function(event){
         //prevent default button response? whatever that wouldve been
         event.preventDefault();
         //toggle hide/show on the pawn selection/link sharing modal
@@ -113,6 +134,8 @@ $(document).ready(function(){
         mypawn = pawn;
         //whoami
         $("#names .player").html(mypawn);
+        //reset board (empty all squares)
+        $(".square.micro > div").html("");
     });
     //update board accepts an array of meta tiles labeled M0-M8 to make legal/illegal for local play
     socket.on("updateboard", function(legalities, newmove, moves){
@@ -133,15 +156,23 @@ $(document).ready(function(){
         //save the person who moved locally as last move
         if(newmove !== -1) lastmove = newmove[0];
 
-        //gameplay functionality - determines how the HTML board interacts with the API
-        //very early stages!
+        ////////////////////////////////////HELLO!!!!////////////////////////////////////
+        ///////////////THIS IS WHERE CLICKS ARE REGISTERED TO THE SERVER/////////////////
+        ///////////////IT'S VERY EASY TO LOSE TRACK OF, SO I WROTE THIS//////////////////
+        //gameplay functionality - determines how the HTML board interacts with the API//
+        ////~~~~~~~~~~~~~~~~~~~~~~~~~~very early stages!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~////
+        /////////////////////////////////////////////////////////////////////////////////
         $(".square.meta.legal > .square.micro").on("click", function(){
             newMove($(this));
             
             //debugging
             console.log("got a click on: " + $(this).attr("id"));
         });
-        $(".square.meta.illegal > .square.micro").on("click", function(){});
+        $(".square.meta.illegal > .square.micro").on("click", function(){ /*does nothing*/ });
+        /////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////EIND!!!/////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////
+
 
         //push new url with updated move number
         var targeturl = baseurl + "/game/" + gameid + "/" + moves;
@@ -149,6 +180,10 @@ $(document).ready(function(){
 
         //debugging:
         console.log("I received a board update!");
+    });
+    //toolbox socket events
+    server.on('redirect', function(destination) {
+        window.location.href = destination;
     });
 
 
