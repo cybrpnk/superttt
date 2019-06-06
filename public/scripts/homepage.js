@@ -53,13 +53,11 @@ $(document).ready(function(){
 
     //update new move from client helper
     function newMove(element){
-        console.log("new move called: " + lastmove + ", " + squareclicked);
         //double check the NEXT player is taking their turn
         //no second turns
         if(lastmove !== mypawn && !squareclicked){
             //flip the state of global clicked variable, to not spam the newmove event
             squareclicked = true;
-            console.log("setting squareclicked");
             //send newmove command to server with all the needed arguments from the HTML itself
             socket.emit('newmove', gameid, mypawn + element.attr("id"), function(pass){
                 //callback (passed to client after updateboard emit)
@@ -76,9 +74,9 @@ $(document).ready(function(){
             });
         }
         else {
-            console.log("resetting squareclicked");
+            //non-breaking, if erroneous click is sent, but server has not responded
+            //don't block trying again after 1 second
             setTimeout(function(){
-                console.log("within setTimeout");
                 squareclicked = false;
             }, 1000);
         }
