@@ -111,6 +111,9 @@ var game = require("./modules/gameapi.js");
 
 //declare gameplay constants
 var xopening = ["M0","M1","M2","M3","M4","M5","M6","M7","M8"];
+//declare valid move notation format (in regex format)
+//regex equivalent of [beginning of string](X or O)(A-I)(0-9)[end of string]
+var validmove = /^(X|O)([A-I])\d$/
 
 
 //////TO DO:   ///////////////////////////////
@@ -205,45 +208,66 @@ io.on('connection', function(socket){
         //if game exists in games object
         //if games object isn't empty
         if(findgame !== undefined && Object.keys(games).length > 0){
-            //insert imaginary validation conditional here
-            //if(your move isn't bad){
-            
-
+            //simple server-side validation of the move argument
+            //before we make a call to the API
+            if(validmove.test(move)){
                 //send the makeMove command to the Board API, and save the return as themove
                 var themove = findgame.makeMove(move);
-                console.log("the emperor's new moves too");
-                //return of makeMove function is saved, because makeMove() method
-                //should be in charge of all validation to pushing to the board array
-                //then should return any errors, and fail gracefully
-                //a future implementation of this socket event should have stricter rules based on makeMove()'s return
-                //if the move is from x
-                if(themove[0] === 1 ) {
-                    //update both players local boards, updating new legal moves, and moves to be added to the board
-                    io.to(findgame.players.o).emit("updateboard", ["M" + findgame.nextLegal.toString()], move, findgame.movelist.length);
-                    io.to(findgame.players.x).emit("updateboard", [], move, findgame.movelist.length);
-                }
-                //if the move is from o
-                if(themove[0] === -1){
-                    //update both players local boards, updating new legal moves, and moves to be added to the board
-                    io.to(findgame.players.x).emit("updateboard", ["M" + findgame.nextLegal.toString()], move, findgame.movelist.length);
-                    io.to(findgame.players.o).emit("updateboard", [], move, findgame.movelist.length);
-                }
-                
-                //debugging
-                //console.log(findgame.metastate);
-                console.log(findgame.movelist);
+                //double check that the move validated through the notation API function
+                if(themove !== false){
+                    //debugging:
+                    console.log("approved new move from client side socket event");
+                    //return of makeMove function is saved, because makeMove() method
+                    //should be in charge of all validation to pushing to the board array
+                    //then should return any errors, and fail gracefully
+                    //a future implementation of this socket event should have stricter rules based on makeMove()'s return
+                    //if the move is from x
+                    if(themove[0] === 1 ) {
+                        //update both players local boards, updating new legal moves, and moves to be added to the board
+                        io.to(findgame.players.o).emit("updateboard", ["M" + findgame.nextLegal.toString()], move, findgame.movelist.length);
+                        io.to(findgame.players.x).emit("updateboard", [], move, findgame.movelist.length);
+                    }
+                    //if the move is from o
+                    if(themove[0] === -1){
+                        //update both players local boards, updating new legal moves, and moves to be added to the board
+                        io.to(findgame.players.x).emit("updateboard", ["M" + findgame.nextLegal.toString()], move, findgame.movelist.length);
+                        io.to(findgame.players.o).emit("updateboard", [], move, findgame.movelist.length);
+                    }
+                    
+                    //if a winner was declared this move
+                    if(themove[3] !== undefined){
+                        //let the players know
+                        io.to(findgame.players.x).emit("winner", themove[3]);
+                        io.to(findgame.players.o).emit("winner", themove[3]);
+                    }
 
-                //confirm newmove sucessfully passed, and callback
-                callback();
+                    //debugging
+                    console.log(findgame.meta);
+                    console.log("[" + findgame.movelist + "]");
 
-            //} --end if
+                    //confirm newmove sucessfully passed, and callback
+                    callback(true);
+                }
+                else {
+                    console.log("Error: [f]ake moves! but it passed regex!");
+                    callback(false);
+                }
+            }
+            else {
+                console.log("Error: [f]ake moves! it did NOT pass regex.");
+                callback(false);
+            }
         }
-        else console.log("Error on newmove: game does not exist");
+        else {
+            console.log("Error on newmove: game does not exist");
+            callback(false);
+        }
 
+    ////end of socket.on('newmove', function(gameid, move, callback) { ... });
     });
 
     
-    //to be built "find game"/ matchmaking function
+    //to be built "find game"/matchmaking function
     //potentially using OAUTH accounts and ELO
     socket.on('matchmaking', function(){
         

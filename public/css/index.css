@@ -163,7 +163,7 @@ specifically the one with options to create a new room*/
                     .square.meta.legal {
                         background-color: #efefef;
                     }
-                        .square.meta.legal > .square.micro {
+                        .square.meta.legal > .square.micro > div {
                             cursor: pointer;
                         }
 
@@ -179,6 +179,7 @@ specifically the one with options to create a new room*/
                         
                         .square.micro > div {
                             text-align: center;
+                            height: 100%;
                         }
 
 

@@ -1,7 +1,7 @@
 ////single game instance metaphor
 ////global game API
 
-//TO DO   - checkLocales and isWinning are completely broken
+//TO DO   - build a mfkin robot 4 this
 //        - send help
 
 
@@ -82,17 +82,6 @@ var address = function(x,y) {
     if(xtrans !== false && ytrans !== false) return xtrans + ytrans;
 }
 
-//what are all the winning positions?
-var winning = [ [1,1,1,0,0,0,0,0,0],
-                [1,0,0,1,0,0,1,0,0],
-                [1,0,0,0,1,0,0,0,1],
-                [0,1,0,0,1,0,0,1,0],
-                [0,0,1,0,1,0,1,0,0],
-                [0,0,1,0,0,1,0,0,1],
-                [0,0,0,1,1,1,0,0,0],
-                [0,0,0,0,0,0,1,1,1]];
-
-
 
 ////send Board class as export through nodejs module
 module.exports = {
@@ -117,7 +106,7 @@ module.exports = {
             //address state multidimensional array with
             //example: this.state[4][4]
             //state property is a human readable duplicate of the ui board
-            //confusing! rows first, not columns [x][y]
+            //confusing! rows first, not columns [y][x]
             this.state= [   [0,0,0,0,0,0,0,0,0],
                             [0,0,0,0,0,0,0,0,0],
                             [0,0,0,0,0,0,0,0,0],
@@ -154,14 +143,31 @@ module.exports = {
 
             //stores next legal meta tile index [0-8] as a property
             this.nextLegal = -1;
-
-            //store metadata about adressing squares
-            this.columns = ["A","B","C","D","E","F","G","H","I"];
-            this.rows = ["1","2","3","4","5","6","7","8","9"];   
             
             //stores a list of past moves
             this.movelist = [];
             
+
+            //metadata about board objects generally:
+            //store metadata about adressing squares
+            this.columns = ["A","B","C","D","E","F","G","H","I"];
+            this.rows = ["1","2","3","4","5","6","7","8","9"];   
+
+            //what are all the winning positions?
+            //UPDATE (6/04/19):
+            //changed winning positions array from array of winning boards
+            //to indexes of 1's within those boards
+            //this allows for better pattern matching on boards
+            //where the player has moves than just the ones that are winning
+            //also allows for the removal of the isEqual function
+            this.winning = [[0,1,2],
+                            [0,3,6],
+                            [0,4,8],
+                            [1,4,7],
+                            [2,4,6],
+                            [2,5,8],
+                            [3,4,5],
+                            [6,7,8]];
 
         }
 
@@ -215,59 +221,69 @@ module.exports = {
             }
         }
         
-        //codified win conditions/rules
-        isWinning() {
+        //update: moved current checkMeta function to its own function, from isWinning()
+        //isWinning() is now a toolbox-y function to compare arrays against
+        //codified win conditions/rules in this.winning
+        //accepts [0-8] array of a 3x3 board, addressed top-left to bottom-right
+        //board formatting must include 1 for X, 0 for nothing, and -1 for O
+        //usage: isWinning([array]) returns [xwon, owon]
+        isWinning(board) {
             //create win arrays for X and O
             //pos evaluates for 1, neg evaluates for -1
             var pos = [];
-            var neg = [];
-
-
+            var neg = [];                 
             //assume no wins so far
             var xwon = false;
             var owon = false;
-
-            //evaluate macro board by breaking it up into wins per team arrays
-            for(var m=0; m<8; m++){
+            //break into individual squares
+            //this loop will generate pos[0-8] and neg[0-8]
+            //per local board
+            for(var s=0; s<9; s++){
                 //check in a positive direction (aka X)
-                if(this.meta[m] === 1){
-                    pos[m] = 1;
-                    neg[m] = 0;
+                if(board[s] === 1){
+                    pos[s] = 1;
+                    neg[s] = 0;
                 }
                 //check in a negative direction (aka O)
-                if(this.meta[m] === -1){
-                    pos[m] = 0;
-                    neg[m] = 1;
+                else if(board[s] === -1){
+                    pos[s] = 0;
+                    neg[s] = 1;
                 }
                 //check for neutrality
-                if(this.meta[m] === 0){
-                    neg[m] = 0;
-                    pos[m] = 0;
+                else {
+                    neg[s] = 0;
+                    pos[s] = 0;
                 }
             }
-
-            console.log(pos);
-            console.log(neg);
-
             //loop through win conditions
             for(var condition=0; condition<8; condition++){
+                //local variable matching to looped win condition
+                var thiswin = this.winning[condition];
                 //pattern match to see if either palyer has won the meta
-                if(isEqual(pos,winning[condition])){ 
+                //pattern matching is done by checking through each win condition
+                //whether the values at each index indicate a win for that player
+                //update local function variables, to later update global array
+                if(pos[thiswin[0]] == 1 && pos[thiswin[1]] == 1 && pos[thiswin[2]] == 1){
                     xwon = true;
+                    //break out of the loop
                     condition = 8;
                 }
-                if(isEqual(neg,winning[condition])){
+                if(neg[thiswin[0]] == 1 && neg[thiswin[1]] == 1 && neg[thiswin[2]] == 1){
                     owon = true;
+                    //break out of the loop
                     condition = 8;
                 }
+                //if not, all is still false
             }
-
             //double check there's no error with our code
-            if(xwon && owon) console.log("MEGA-ERROR: I THINK BOTH OF YALL WON THE GAME");
+            if(xwon && owon) {
+                console.log("MEGA-ERROR: I THINK BOTH OF YALL WON THE GAME");
+                //return both xwon and owon as false, to not break game
+                return [false, false];
+            }
             else {
-                //log final victory
-                if(xwon) console.log("X Wins!");
-                if(owon) console.log("O Wins!");
+                //return array with wins or no wins
+                return [xwon, owon];
             }
         }
 
@@ -278,75 +294,44 @@ module.exports = {
         //determine the game.
         checkLocales() {
             //determine if a player is winning in a local board
+            //index m = board within metastate
             for(var m=0; m<9; m++){
                 //check if specified meta locale has been won,
                 //dont waste compute if it has
                 if(this.meta[m] === 0){
-                    //create win arrays for X and O
-                    //pos evaluates for 1, neg evaluates for -1
-                    var pos = [];
-                    var neg = [];
-                    
-                    //assume no wins so far
-                    var xwon = false;
-                    var owon = false;
-
-                    //break into individual squares
-                    //this loop will create pos[0-8] and neg[0-8]
-                    //per local board
-                    for(var l=0; l<9; l++){
-                        //check in a positive direction (aka X)
-                        if(this.metastate[m][l] === 1){
-                            pos[l] = 1;
-                            neg[l] = 0;
-                        }
-                        //check in a negative direction (aka O)
-                        else if(this.metastate[m][l] === -1){
-                            pos[l] = 0;
-                            neg[l] = 1;
-                        }
-                        //check for neutrality
-                        else {
-                            neg[l] = 0;
-                            pos[l] = 0;
-                        }
-                    }
-
-                    //console.log("board - M" + m + "pos: [" + pos + "]");
-                    //console.log("board - M" + m + "neg: [" + neg + "]");
-                    
-                    //loop through win conditions
-                    for(var condition=0; condition<8; condition++){
-                        //pattern match to see if either palyer has won the meta
-                        //update local function variables, to later update global array
-                        if(isEqual(pos,winning[condition])){
-                            xwon = true;
-                            condition = 8;
-                        }
-                        if(isEqual(neg,winning[condition])){
-                            owon = true;
-                            condition = 8;
-                        }
-                        //if not, all is still false
-                    }
+                    //call our win condition function, save return as wins ([xwon],[owon])
+                    var wins = this.isWinning(this.metastate[m]);
 
                     //debugging:
-                    if(xwon) console.log("!!!X wins tile: M" + m + "!!!");
-                    if(owon) console.log("O wins tile: M" + m + "!!!");
+                    if(wins[0]) console.log("!!!X wins tile: M" + m + "!!!");
+                    if(wins[1]) console.log("O wins tile: M" + m + "!!!");
 
-                    //double check there's no error with our code
-                    if(xwon && owon) console.log("MEGA-ERROR: I THINK BOTH OF YALL WON LOCALE #" + M + "!");
-                    else {
-                        //update "battle" win history/state board array,
-                        //only if board is won, and has not previously been won
-                        if(xwon && this.meta[m] === 0) this.meta[m] = 1;
-                        if(owon && this.meta[m] === 0) this.meta[m] = -1;
-
-                        //debugging:
-                        //console.log(this.metastate[m]);
-                    }
-
+                    //update "battle" win history/state board array,
+                    //only if board is won, and has not previously been won
+                    if(wins[0] && this.meta[m] === 0) this.meta[m] = 1;
+                    if(wins[1] && this.meta[m] === 0) this.meta[m] = -1;
+                //end if
                 }
+            //end for
+            }
+        //end of checkLocales()
+        }
+
+        checkMeta(){
+            //call our win condition function, save return as wins ([xwon],[owon])
+            var wins = this.isWinning(this.meta);
+
+            //send out win statuses
+            if(wins[0]){
+                console.log(">>>>>>>>>>>>>>>>X Wins!<<<<<<<<<<<<<<<<<");
+                return "X";
+            }
+            else if(wins[1]){
+                console.log(">>>>>>>>>>>>>>>>O Wins!<<<<<<<<<<<<<<<<<");
+                return "O";
+            }
+            else {
+                return false;
             }
         }
 
@@ -356,15 +341,12 @@ module.exports = {
         //move must be in three character notation form (string)
         //what's the (move)?
         makeMove(move){
-            console.log("just got makeMove");
             //if this is the first move, force X to move
             if(this.nextLegal == -1) var lastmove = ["O"];
             //if not, log the last move
             else var lastmove = this.notation(this.movelist[this.movelist.length-1], false);
-            console.log("just set lastmove");
             //estabilsh the move we're trying to make in computer readable notation
             var themove = this.notation(move, true);
-            console.log("just set new move");
 
             //check if the opposite player is moving
             //ensure move validated, if not throw breaking error and do nothing
@@ -385,10 +367,17 @@ module.exports = {
                         var transtometa = (themove[1]%3)+(3*(themove[2]%3));
                         this.metastate[address(themove[1],themove[2])][transtometa] = themove[0];
                         //check win statuses
+                        //check local board wins
                         this.checkLocales();
-                        this.isWinning();
+                        //check the meta-game
+                        var whowon = this.checkMeta();
+                        //if a winner was declared with this move, 
+                        //send it as a special 4th character in the return
+                        if(whowon) themove[3] = whowon;
+                        //update the next legal move class-wide
                         this.nextLegal = transtometa;
 
+                        //spit back out the move that was made if valid
                         return themove;
                     }
                     else {

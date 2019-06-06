@@ -40,6 +40,8 @@ $(document).ready(function(){
     var mypawn = undefined;
     //save the last move (mainly for the last person who moved)
     var lastmove = "O";
+    //also save the state of a clicked square being processed (usabiliy fix 6/6)
+    var squareclicked = false;
 
     //connect if default gameid is already set, if so make proper updates
     if(gameid !== 0){
@@ -51,14 +53,34 @@ $(document).ready(function(){
 
     //update new move from client helper
     function newMove(element){
+        console.log("new move called: " + lastmove + ", " + squareclicked);
         //double check the NEXT player is taking their turn
         //no second turns
-        if(lastmove !== mypawn){
+        if(lastmove !== mypawn && !squareclicked){
+            //flip the state of global clicked variable, to not spam the newmove event
+            squareclicked = true;
+            console.log("setting squareclicked");
             //send newmove command to server with all the needed arguments from the HTML itself
-            socket.emit('newmove', gameid, mypawn + element.attr("id"), function(){
-                //callback
-                lastmove = mypawn;
+            socket.emit('newmove', gameid, mypawn + element.attr("id"), function(pass){
+                //callback (passed to client after updateboard emit)
+                //if the move passed
+                if(pass){
+                    //save the last moved player
+                    lastmove = mypawn;
+                }
+                else {
+                    console.log("invalid move thrown");
+                }
+                //reset our clicked boolean, and allow clicks again
+                squareclicked = false;
             });
+        }
+        else {
+            console.log("resetting squareclicked");
+            setTimeout(function(){
+                console.log("within setTimeout");
+                squareclicked = false;
+            }, 1000);
         }
     }
     //////////---GAME DEPENDENCIES---/////////////////////////////
@@ -120,7 +142,10 @@ $(document).ready(function(){
             //push the new URL
             pushAble("Super Tic-Tac-Toe - Waiting for Players!", $("input.linkshare").val());
             //push the gameid to the local cache
-            $("#gameid").val(gameid);
+            $("#gameid").val(gameid); 
+            //reset game board (empty all squares, and reset legalities)
+            $(".square.micro > div").html("");
+            $(".square.meta, .square.micro").addClass("illegal").removeClass("legal");
         });
     });
 
@@ -134,8 +159,6 @@ $(document).ready(function(){
         mypawn = pawn;
         //whoami
         $("#names .player").html(mypawn);
-        //reset board (empty all squares)
-        $(".square.micro > div").html("");
     });
     //update board accepts an array of meta tiles labeled M0-M8 to make legal/illegal for local play
     socket.on("updateboard", function(legalities, newmove, moves){
@@ -144,13 +167,15 @@ $(document).ready(function(){
             $("#"+newmove[1]+newmove[2]+" > div").html(newmove[0]);
         }
 
-        //reset all meta squares to illegal
-        //i feel like this line isn't doing it's job properly
-        $(".square.meta").addClass("illegal").removeClass("legal");
+        //reset all meta and micro squares to illegal
+        ////old: i feel like this line isn't doing it's job properly
+        //update: i was right, the class and click actions should be on the > div element
+        //within each .square.micro
+        $(".square.meta, .square.micro").addClass("illegal").removeClass("legal");
         //loop through all new legal areas, if they exist
         for(var i = 0; i < legalities.length; i++){
-            //toggle new legal plays
-            $(".square.meta#" + legalities[i]).toggleClass("illegal legal")
+            //toggle new legal plays to 9 squares on the board
+            $(".square.meta#" + legalities[i] + ", #" + legalities[i] + "> .square.micro").toggleClass("illegal legal");
         }
 
         //save the person who moved locally as last move
@@ -162,13 +187,14 @@ $(document).ready(function(){
         //gameplay functionality - determines how the HTML board interacts with the API//
         ////~~~~~~~~~~~~~~~~~~~~~~~~~~very early stages!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~////
         /////////////////////////////////////////////////////////////////////////////////
-        $(".square.meta.legal > .square.micro").on("click", function(){
-            newMove($(this));
+        $(".square.micro.legal > div").on("click", function(){
+            //send the .square.micro jquery DOM object to our newmove function
+            newMove($(this).parent());
             
             //debugging
-            console.log("got a click on: " + $(this).attr("id"));
+            console.log("got a click on: " + $(this).parent().attr("id"));
         });
-        $(".square.meta.illegal > .square.micro").on("click", function(){ /*does nothing*/ });
+        $(".square.micro.illegal > div").on("click", function(){ /*does nothing*/ });
         /////////////////////////////////////////////////////////////////////////////////
         /////////////////////////////////////EIND!!!/////////////////////////////////////
         /////////////////////////////////////////////////////////////////////////////////
@@ -180,6 +206,10 @@ $(document).ready(function(){
 
         //debugging:
         console.log("I received a board update!");
+    });
+    //announces the winner of the game
+    socket.on("winner", function(pawn){
+        alert(pawn + " Wins!!!");
     });
     //toolbox socket events
     server.on('redirect', function(destination) {
