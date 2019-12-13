@@ -16,7 +16,7 @@ you got three files to worry about:
 everything else is basic HTML or CSS
 
 To begin the SuperTTT NodeJS use the following commands after installing nodejs, npm, and nodemon (optional, only for devs):
-...
+```
 npm start
 npm test
-...
+```
